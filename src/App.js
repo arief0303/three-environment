@@ -1,6 +1,7 @@
 import './App.css';
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls, GizmoHelper, GizmoViewport, SoftShadows, PivotControls, useGLTF, Center } from '@react-three/drei'
+import { useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { OrbitControls, GizmoHelper, GizmoViewport, SoftShadows, PivotControls, useGLTF, Center, Float } from '@react-three/drei'
 
 function App() {
   return (
@@ -36,6 +37,17 @@ function App() {
             </Center>
           </PivotControls>
 
+          <PivotControls rotation={[0, -Math.PI / 2, 0]} anchor={[1, -1, -1]} scale={75} depthTest={false} fixed lineWidth={2}>
+            <Float
+              speed={1}
+              rotationIntensity={1}
+              floatIntensity={3}
+              floatingRange={[0, 0.2]}
+            >
+              <WireframeBox castShadow position={[-0.5, 1, -2]} />
+            </Float>
+          </PivotControls>
+
           <mesh scale={20} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry />
             <shadowMaterial transparent opacity={0.5} />
@@ -57,6 +69,22 @@ function Cup(props) {
       {...props}
       dispose={null}
     />
+  )
+}
+
+function WireframeBox(props) {
+  const ref = useRef()
+
+  useFrame((_, delta) => {
+    ref.current.rotation.x += 1 * delta
+    ref.current.rotation.y += 0.5 * delta
+  })
+
+  return (
+    <mesh {...props} ref={ref}>
+      <boxGeometry />
+      <meshBasicMaterial color={0x00ff00} wireframe />
+    </mesh>
   )
 }
 
